@@ -1,0 +1,56 @@
+{% extends 'mymediastash/base/index.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'mymediastash/scripts/datatables.html' %}
+<br>
+
+<table id="dt_books" class="table table-striped w-100">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Author</th>
+      <th>Published</th>
+      <th>Publisher</th>
+      <th>Bookshelf</th>
+      <th>Location</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for book in books %}
+    <tr>
+      <td><a href="{{ book.id }}">{{ book.title }}</a></td>
+      <td>{{ book.author }}</td>
+      <td>{{ book.published }}</td>
+      <td>{{ book.publisher }}</td>
+      <td>{{ book.bookshelf }}</td>
+      <td>{{ book.location }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<form action="{% url 'import-books' %}" method="post" class="mb-2">
+    {% csrf_token %}
+    <button class="btn btn-success" type="submit" name="import-button">Import Books</button>
+</form>
+
+<form action="{% url 'clear-books' %}" method="post" class="mb-2">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit" name="clear-button">Clear Books</button>
+</form>
+
+<script>
+$(document).ready(function () {
+    var table = $('#dt_books').DataTable({
+        processing: true,
+        orderCellsTop: true,
+        fixedHeader: true,
+        dom: 'flrtip',
+        lengthMenu: [ [10, 20, 50, 100, -1], [10, 20, 50, 100, "vše"] ],
+        pageLength: 50,
+    });
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'mymediastash/base/index.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container mt-4">
+  <h1>Book Details</h1>
+
+  <div class="row">
+    <!-- Left column for book details -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Title</h5>
+          <p class="card-text">{{ book.title }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Author</h5>
+          <p class="card-text">{{ book.author }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">ISBN</h5>
+          <p class="card-text">{{ book.isbn }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Publisher</h5>
+          <p class="card-text">{{ book.publisher }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Published</h5>
+          <p class="card-text">{{ book.published }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Pages</h5>
+          <p class="card-text">{{ book.pages }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Bookshelf</h5>
+          <p class="card-text">{{ book.bookshelf }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Notes</h5>
+          <p class="card-text">{{ book.notes }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Location</h5>
+          <p class="card-text">{{ book.location }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Description</h5>
+          <p class="card-text">{{ book.description }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Genre</h5>
+          <p class="card-text">{{ book.genre }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Language</h5>
+          <p class="card-text">{{ book.language }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Date added</h5>
+          <p class="card-text">{{ book.date_added }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Goodreads</h5>
+          <p class="card-text">{{ book.goodreads_book_id }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right column for book cover -->
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Cover</h5>
+          {% if book.cover %}
+          <img src="{{ book.cover.url }}" class="card-img-top" alt="Book Cover">
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <div class="card-body">
+          <h5 class="card-title">Series detail</h5>
+          <p class="card-text">{{ book.series_details }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Anthology</h5>
+          <p class="card-text">{{ book.anthology }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Anthology titles</h5>
+          <p class="card-text">{{ book.anthology_titles }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Signed</h5>
+          <p class="card-text">{{ book.signed }}</p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Loaned to</h5>
+          <p class="card-text">{{ book.loaned_to }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
