@@ -1,10 +1,10 @@
 import json
-import urllib.request
-import urllib.parse
-import urllib.error
+from urllib.parse import urlparse
 import time
+from io import BytesIO
 
 import requests
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.core.files import File
@@ -37,6 +37,9 @@ def import_books_from_json(file):
     except json.JSONDecodeError as e:
         print(f"Invalid JSON file: {e}")
         return
+
+    api_key = settings.GOOGLE_API_KEY
+    cx_id = settings.GOOGLE_CX_ID
 
     for book_data in json_data:
         published_date = book_data['date_published']
@@ -73,7 +76,9 @@ def import_books_from_json(file):
         search_query = f"{book_data['title']} {book_data['author_details']} {published_year}"
 
         # Perform an image search and get the URL of the first image result
-        image_url = perform_image_search(search_query)
+        image_url = perform_image_search(search_query, api_key, cx_id)
+
+        print(f"Image URL: {image_url}")  # Add this line to print the image URL
 
         # Download the image and save it as a File object
         cover_image = download_image(image_url)
@@ -106,36 +111,30 @@ def import_books_from_json(file):
         book.save()
 
 
-def perform_image_search(query, max_retries=3, timeout=5):
-    base_url = "http://covers.openlibrary.org/b/ID/medium.jpg"
+def perform_image_search(query, api_key, cx, max_retries=3, timeout=5):
+    base_url = "https://www.googleapis.com/customsearch/v1"
 
-    # Check if the query is an ISBN, if so, use it in the URL directly
-    if query.isdigit():
-        image_url = base_url.replace("ID", f"isbn/{query}")
-        return image_url
-
-    # If not an ISBN, perform a text search with the title and author
-    search_url = "http://openlibrary.org/search.json"
+    # Create the request parameters
     params = {
+        "key": api_key,
+        "cx": cx,
         "q": query,
-        "limit": 1
+        "searchType": "image",
+        "num": 1  # Number of images to retrieve, set to 1 to get the first image only
     }
 
     for retry in range(max_retries + 1):
         try:
-            response = requests.get(search_url, params=params, timeout=timeout)
+            response = requests.get(base_url, params=params, timeout=timeout)
             response.raise_for_status()
             data = response.json()
 
-            if 'docs' in data and len(data['docs']) > 0:
-                # Use the first search result to construct the image URL
-                first_result = data['docs'][0]
-                cover_id = first_result.get('cover_i')
-                if cover_id:
-                    image_url = base_url.replace("ID", f"id/{cover_id}")
-                    return image_url
+            if 'items' in data and len(data['items']) > 0:
+                # Use the first search result to get the image URL
+                image_url = data['items'][0]['link']
+                return image_url
 
-            # If no matching results or no cover information, return None
+            # If no matching results or no image information, return None
             return None
 
         except requests.RequestException as e:
@@ -152,11 +151,18 @@ def download_image(image_url):
     if image_url is None:
         return None
 
+    parsed_url = urlparse(image_url)
+    if parsed_url.scheme == 'x-raw-image':
+        # Skip processing URLs with the scheme 'x-raw-image'
+        return None
+
     response = requests.get(image_url)
     if response.status_code == requests.codes.ok:
-        # Create a File object from the response content
-        image_file = File(response.content)
-        return image_file
+        # Create a File object from the response content using BytesIO
+        image_content = BytesIO(response.content)
+        book_cover = File(image_content, name=image_url.split('/')[-1])
+
+        return book_cover
 
     return None
 
