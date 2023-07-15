@@ -32,7 +32,7 @@ class Book(models.Model):
     language = models.TextField(blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     goodreads_book_id = models.TextField(blank=True)
-    cover = models.FileField(upload_to='book_covers/', blank=True)
+    cover = models.FileField(upload_to='book_covers/', blank=True, max_length=500)
 
     class Meta:
         verbose_name = 'Book'
