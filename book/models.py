@@ -16,7 +16,8 @@ class Book(models.Model):
             MinValueValidator(1000),
             MaxValueValidator(datetime.now().year)],
         help_text="Use the following format: YYYY",
-        null=True
+        null=True,
+        blank=True
     )
     bookshelf = models.TextField(blank=True)
     series_details = models.TextField(blank=True)

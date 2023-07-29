@@ -54,7 +54,10 @@ def import_books_from_json(file):
         # Check if the pages is a valid integer
         pages = book_data.get('pages')
         if pages:
-            pages = int(pages) if pages.isdigit() else None
+            try:
+                pages = int(pages)
+            except ValueError:
+                pages = None
         else:
             pages = None
 
